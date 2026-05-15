@@ -1,0 +1,32 @@
+# Soccerdata HTML cache — 1.1 GB, regenerate with src/ingest.py
+data/cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.env
+.venv
+venv/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Logs — regenerate by running src/
+logs/
+
+# Driver lock file (soccerdata selenium)
+downloaded_files/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
