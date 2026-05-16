@@ -1,0 +1,9 @@
+covariate,smd_before,smd_after,balanced,flag,structural_note
+score_diff_at_sub,0.0092,0.0127,True,,
+opponent_points_l4,0.0059,0.0014,True,,
+subs_used_before,0.0312,0.0053,True,,
+is_home,0.0183,0.0016,True,,
+is_winning,0.0207,0.003,True,,
+is_losing,0.0656,0.0105,True,,
+log1p_player_quality,1.4811,1.481,False,STRUCTURAL,structural: null for all control rows; SMD is not a matching-quality indicator
+player_out_minutes_l30_filled,2.3036,2.3038,False,STRUCTURAL,structural: null for all control rows; SMD is not a matching-quality indicator
