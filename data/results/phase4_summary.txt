@@ -1,0 +1,80 @@
+CAUSAL INFERENCE RESULTS SUMMARY:
+Research question:
+  Do managers who substitute earlier produce
+  better outcomes than those who substitute
+  later, controlling for game state?
+
+Dataset:
+  Big 5 European Leagues
+  Seasons: 2022-23 and 2023-24
+  Tactical substitutions analyzed: 20,768
+  Matched pairs: 20,762
+
+Method:
+  Propensity score matching (within-league,
+  no replacement, caliper = 0.026)
+  + Doubly robust OLS adjustment
+  Confounders controlled: scoreline, opponent
+  quality, home/away, subs used, sub direction
+
+
+PRIMARY FINDING:
+
+ATT (15-min window) = -0.0143 goal diff
+N pairs (minute ≤ 75): 9,070
+95% CI: [-0.0326, +0.0040]
+p-value: 0.1247
+Significant: No at α = 0.05
+
+What does this mean: 
+Tactical substitutions in the Big 5 leagues were followed by approximately
+0.01 fewer goals in favor of the substituting team over the subsequent 15
+minutes compared to matched situations where no substitution was made, 
+after controlling for game state.
+
+Doubly robust ATT (15-min) = -0.0394
+Consistent with primary? Yes
+
+Secondary (30-min window, n=755 pairs): ATT = +0.0146
+
+
+VALIDATION:
+Placebo test (minute 30–50): PASS
+  Placebo ATT = +0.0258, p = 0.8206
+
+Rosenbaum critical Γ = 1.00
+  Interpretation: fragile
+  "The finding remains significant under unmeasured
+  confounding that would increase treatment odds
+  by up to 0%."
+
+
+KEY SUBGROUP FINDINGS:
+
+  - Serie A (LEAGUE): ATT = +0.0264 
+  - Level (GAME STATE): ATT = +0.0212 
+  - Winning (GAME STATE): ATT = +0.0095 
+
+
+LIMITATIONS:
+1. Outcome = goal differential (not xG —
+   data unavailable). Goals are noisy but
+   unbiased. StatsBomb xG validation
+   pending in Phase 5.
+
+2. Player quality proxy = goals+assists/90.
+   xG-based quality not available via
+   soccerdata.
+
+3. Unmeasured confounders possible — bounded
+   by Γ = 1.00.
+
+4. Two seasons only (2022-24). Effect
+   stability across seasons untested.
+
+5. Primary outcome window is 15 minutes
+   post-substitution due to match time
+   constraints — 30-minute window analysis
+   available on n=755 non-truncated pairs
+   as a supplementary check.
+

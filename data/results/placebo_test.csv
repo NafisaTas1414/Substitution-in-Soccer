@@ -1,0 +1,2 @@
+placebo_minute,n_obs,n_pairs,att,se,ci_lower,ci_upper,p_value,passes
+30–50,477,176,0.025806,0.113573,-0.196797,0.24841,0.820552,True

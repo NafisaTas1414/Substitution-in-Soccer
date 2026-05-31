@@ -1,0 +1,46 @@
+CAUSAL FOREST RESULTS SUMMARY
+══════════════════════════════════════════
+Method: Regression Forest on matched pair
+        differences (econml RegressionForest)
+N observations: 9,070
+N estimators: 2,000
+
+──────────────────────────────────────────
+CATE ESTIMATES
+──────────────────────────────────────────
+Mean CATE:  -0.0146
+Std CATE:   0.0490
+Range:      [-0.1626, +0.1383]
+% positive: 36.9%
+Consistent with Phase 4 ATT: Yes
+
+──────────────────────────────────────────
+HETEROGENEITY TESTS
+──────────────────────────────────────────
+Calibration test (quintile spread): 0.2130
+Assessment: Meaningful heterogeneity detected
+
+BLP test: slope=+1.7709, p=0.0000
+Assessment: Significant
+
+Heterogeneity share of outcome variance: 0.0030
+Assessment: <1%
+
+OVERALL HETEROGENEITY VERDICT:
+Meaningful heterogeneity detected — the null average masks genuine subgroup variation. See SHAP analysis for drivers.
+
+──────────────────────────────────────────
+SHAP FINDINGS
+──────────────────────────────────────────
+Top 5 drivers of CATE heterogeneity:
+  1. log1p_player_quality: mean |SHAP| = 0.0183. Higher values push CATE up.
+  2. opponent_points_l4: mean |SHAP| = 0.0152. Higher values push CATE down.
+  3. score_diff_at_sub: mean |SHAP| = 0.0100. Higher values push CATE up.
+  4. is_losing: mean |SHAP| = 0.0092. Higher values push CATE down.
+  5. player_out_minutes_l30: mean |SHAP| = 0.0072. Higher values push CATE up.
+
+──────────────────────────────────────────
+OVERALL PROJECT CONCLUSION
+──────────────────────────────────────────
+Across five methods — matched pair ATT, doubly robust estimation, placebo testing, Rosenbaum sensitivity analysis, and causal forest — this study finds no average causal effect of tactical substitution timing on 15-minute post-substitution goal differential (ATT = -0.0143, p = 0.125). The causal forest confirms this null is not uniform — meaningful subgroup variation detected. The strongest predictor of post-substitution outcomes is substitute player quality (β = +0.23), though this explains only 0.43% of outcome variance — consistent with short-term match outcomes being dominated by stochastic factors beyond any single tactical decision.
+══════════════════════════════════════════

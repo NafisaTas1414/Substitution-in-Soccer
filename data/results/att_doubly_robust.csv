@@ -1,0 +1,2 @@
+estimator,outcome_window,dr_att,dr_se,ci_lower,ci_upper,p_value,significant_05,step1_att,diff_vs_step1,assessment,qual_coef,fatigue_coef
+doubly_robust_OLS_HC3,15min,-0.039362,0.010379,-0.059705,-0.01902,0.000149,True,-0.014333,-0.025029,"Moderate (|diff|=0.025, 0.02≤|diff|<0.05)",0.228195,-3e-05

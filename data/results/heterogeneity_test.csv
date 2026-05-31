@@ -1,0 +1,7 @@
+quintile,mean_predicted_cate,mean_actual_outcome,n,test,quintile_spread,quintile_verdict,blp_slope,blp_pvalue,blp_r2,blp_verdict,var_cate,var_outcome,heterogeneity_share,var_verdict,overall_verdict
+1,-0.06997443651500558,-0.12110091743119267,545,quintile_calibration,,,,,,,,,,,
+2,-0.038248742698685674,-0.08088235294117647,544,quintile_calibration,,,,,,,,,,,
+3,-0.016217909738956388,-0.04044117647058824,544,quintile_calibration,,,,,,,,,,,
+4,0.007816301956348219,0.09191176470588236,544,quintile_calibration,,,,,,,,,,,
+5,0.04805648244590782,0.04779411764705882,544,quintile_calibration,,,,,,,,,,,
+,,,,summary,0.213013,Meaningful heterogeneity detected,1.770883,1.5e-05,0.006861,CATE estimates have predictive signal — heterogeneity is real,0.002399,0.790313,0.003035,Treatment effect heterogeneity explains less than 1% of outcome variance — consistent with null average effect,Meaningful heterogeneity detected — the null average masks genuine subgroup variation. See SHAP analysis for drivers.

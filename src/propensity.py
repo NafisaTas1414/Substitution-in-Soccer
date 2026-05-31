@@ -31,9 +31,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.neighbors import KDTree
 from sklearn.preprocessing import StandardScaler
 
-# ─────────────────────────────────────────────────────────────
 # Paths and logging
-# ─────────────────────────────────────────────────────────────
 ROOT          = Path(__file__).parent.parent
 PROCESSED_DIR = ROOT / "data" / "processed"
 RESULTS_DIR   = ROOT / "data" / "results"
@@ -52,9 +50,7 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-# ─────────────────────────────────────────────────────────────
 # Constants
-# ─────────────────────────────────────────────────────────────
 PURPLE = "#7F77DD"
 TEAL   = "#1D9E75"
 CORAL  = "#D85A30"
@@ -124,9 +120,7 @@ _COEF_INTERP = {
 }
 
 
-# ─────────────────────────────────────────────────────────────
 # Helpers
-# ─────────────────────────────────────────────────────────────
 def _game_state_series(df: pd.DataFrame) -> pd.Series:
     """Derive Winning/Level/Losing label from is_winning / is_losing."""
     win = pd.to_numeric(df["is_winning"], errors="coerce").fillna(0).astype(int)
@@ -169,9 +163,7 @@ def _logit_ps(ps_series: pd.Series) -> pd.Series:
     return np.log(ps_clipped / (1 - ps_clipped)).clip(-10, 10)
 
 
-# ─────────────────────────────────────────────────────────────
 # STEP 1 — Filter to analysis sample
-# ─────────────────────────────────────────────────────────────
 def filter_sample(mr: pd.DataFrame) -> pd.DataFrame:
     """
     Remove red-card matches, injury/disciplinary subs; add flags.
@@ -242,9 +234,7 @@ def filter_sample(mr: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-# ─────────────────────────────────────────────────────────────
 # STEP 2 — Prepare features for propensity model
-# ─────────────────────────────────────────────────────────────
 def prepare_features(df: pd.DataFrame) -> tuple:
     """
     Transform and one-hot encode features. Fits StandardScaler on full
@@ -337,9 +327,7 @@ def prepare_features(df: pd.DataFrame) -> tuple:
     return df, X, feature_names
 
 
-# ─────────────────────────────────────────────────────────────
 # STEP 3 — Estimate propensity scores
-# ─────────────────────────────────────────────────────────────
 def estimate_propensity(
     df: pd.DataFrame, X: np.ndarray, feature_names: list
 ) -> tuple:
@@ -433,9 +421,7 @@ def estimate_propensity(
     return df, model, coef_df, auc
 
 
-# ─────────────────────────────────────────────────────────────
 # STEP 4 — Assess common support
-# ─────────────────────────────────────────────────────────────
 def assess_common_support(df: pd.DataFrame) -> pd.DataFrame:
     """
     Trim observations outside the overlap region.
@@ -519,9 +505,7 @@ def assess_common_support(df: pd.DataFrame) -> pd.DataFrame:
     return df_trim
 
 
-# ─────────────────────────────────────────────────────────────
 # STEP 5 — Nearest neighbor matching with caliper
-# ─────────────────────────────────────────────────────────────
 def _do_match(df: pd.DataFrame, caliper: float) -> pd.DataFrame:
     """
     Inner matching loop. Per-league KDTree nearest-neighbor without replacement.
@@ -691,9 +675,7 @@ def match_observations(df: pd.DataFrame) -> tuple:
     return pairs, caliper
 
 
-# ─────────────────────────────────────────────────────────────
 # STEP 6 — Balance assessment and love plot
-# ─────────────────────────────────────────────────────────────
 def assess_balance(
     df: pd.DataFrame, pairs: pd.DataFrame, caliper: float
 ) -> tuple:
@@ -867,9 +849,7 @@ def _plot_love(bal_df: pd.DataFrame, n_matched: int) -> None:
     log.info("Saved love_plot.png")
 
 
-# ─────────────────────────────────────────────────────────────
 # Validation summary (Section 4 of spec)
-# ─────────────────────────────────────────────────────────────
 def _print_validation(
     mr_orig: pd.DataFrame,
     df_sample: pd.DataFrame,
@@ -993,9 +973,7 @@ def _print_validation(
     print("\n" + "=" * 60)
 
 
-# ─────────────────────────────────────────────────────────────
 # Orchestrator
-# ─────────────────────────────────────────────────────────────
 def run_all() -> tuple:
     log.info("=" * 60)
     log.info("Phase 3 — Propensity Score Matching — START")

@@ -1,0 +1,2 @@
+n_treated,rsquared,quality_coef,quality_se,ci_lower,ci_upper,p_value,significant_05
+11066,0.004297,0.221663,0.033537,0.155931,0.287395,0.0,True
