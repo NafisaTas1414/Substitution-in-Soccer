@@ -16,6 +16,14 @@ This is textbook confounding. To isolate the causal effect of timing, every subs
 
 ---
 
+## Literature and Research Gap
+
+Previous research has studied soccer substitutions by examining both when coaches make substitutions and whether there is an optimal time to act. [Del Corral, Prieto-Rodriguez & Barros (2008)](https://journals.sagepub.com/doi/10.1177/1527002507308309) used survival analysis on the Spanish league and found that substitution timing is strongly driven by match context — especially the current scoreline — confirming that substitutions are not random decisions but are shaped by whether a team is winning, losing, or level. [Silva & Swartz (2016)](https://ideas.repec.org/a/bpj/jqsprt/v12y2016i3p113-122n3.html) examined substitution timing across multiple leagues and found no consistent timing window in which substitutions reliably improve outcomes. Together, these studies show that substitution timing is important to study but difficult to separate from the match context that drives it.
+
+This project builds on that literature by focusing specifically on the causal effect of substitution timing on short-term match outcomes. Instead of only analysing when substitutions happen, it compares each substitution moment to a matched no-substitution moment using propensity score matching — controlling for scoreline, home advantage, opponent quality, league, and prior substitution activity at the moment of the decision. The main finding is that earlier substitution timing does not have a statistically significant average effect on goal differential in the following 15 minutes. This suggests that who comes on matters more than when — substitute player quality is the strongest predictor of post-substitution outcomes across all five leagues.
+
+---
+
 ## Key Results
 
 **Method 1 — Propensity Score Matching (primary)**

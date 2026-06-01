@@ -100,10 +100,14 @@ Phase 5 used a causal forest to estimate a separate treatment effect for every i
 
 ## What the Project Taught
 
-The biggest practical lesson was about the gap between the data you want and the data you can get. The xG problem arrived in Phase 1 and forced a design change before any modeling began. The truncation wall arrived in Phase 4 and invalidated the original outcome window. Both were solvable — but solving them required understanding why they were problems, not just working around them.
+Two things broke during this project, and both of them changed the design before I got anywhere near a result.
 
-A null result is not a failed project. It is an answer. Prior research found the same thing using a different method. This project confirmed that result using a more rigorous causal design, across five leagues and two seasons. Replicating a null with better methods is a contribution — it narrows the space of plausible conclusions.
+The first was xG. I planned to use expected goals as the outcome variable from the start — it is a better measure than raw goals because it filters out the noise of whether shots actually went in. The data did not cooperate. The scraping library I used did not expose xG columns, and the only source that had them only covered 66 matches. That is not enough. So I switched to goal differential and moved on. It is noisier but it is unbiased, and it is what the prior literature uses anyway.
 
-The most valuable single step in the entire project was drawing the causal graph before touching the data. Deciding which variables to control for, which to exclude because they sit on the causal pathway, and which would create new problems if conditioned on — all of that came from the graph, not from the data. Without it, the analysis could have produced a result that looked right but was biased in ways that would not be visible in the output.
+The second was the 30-minute outcome window. The original plan was to measure what happened in the 30 minutes after each substitution. When I actually applied that filter, 96% of my matched pairs disappeared — most substitutions happen too late in the match for 30 minutes to fit. I had not thought about this before building the matching pipeline. Switching to 15 minutes recovered 9,000 pairs, which was enough to work with, but it was a real design change, not a minor tweak.
 
-With shot-level xG for all 3,585 matches, the outcome variable would be substantially cleaner. The truncation problem would still exist — it is geometric, not a data quality issue — but the surviving pairs would measure something more precise than raw goals in a 15-minute window.
+Both problems were fixable. But fixing them required understanding what was actually wrong rather than just adjusting numbers until the pipeline ran again.
+
+The null result was harder to sit with than I expected. When you spent 2 months building something and it tells you that the thing you studied does not matter on average, the instinct is to look for what went wrong. The same finding shows up in the prior literature using simpler methods. What this project adds is that it shows up again with a much more careful design — propensity matching, doubly robust estimation, a placebo test, sensitivity analysis. If the effect were real and large, one of those would have caught it.
+
+The SHAP result at the end was the most genuinely interesting output. I went in asking whether timing matters. The data answered: not much, but the quality of who you bring on does. That is a more useful finding for anyone actually thinking about how to build a squad.
