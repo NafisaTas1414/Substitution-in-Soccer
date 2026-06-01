@@ -177,7 +177,6 @@ def filter_sample(mr: pd.DataFrame) -> pd.DataFrame:
     n0_ctl = (mr["treated"] == 0).sum()
     log.info("Input: %d treated, %d control rows", n0_trt, n0_ctl)
 
-    # ── 1a: red card match removal ───────────────────────────
     red_match_ids = set(
         mr.loc[(mr["treated"] == 1) & (mr["is_red_card_match"] == 1), "match_id"]
     )
@@ -189,7 +188,6 @@ def filter_sample(mr: pd.DataFrame) -> pd.DataFrame:
         len(red_match_ids), n_rc_trt, n_rc_ctl,
     )
 
-    # ── 1b: sub-type filter ───────────────────────────────────
     trt = mr[mr["treated"] == 1].copy()
     ctl = mr[mr["treated"] == 0].copy()
 
@@ -204,7 +202,6 @@ def filter_sample(mr: pd.DataFrame) -> pd.DataFrame:
         n_inj, n_disc, len(trt),
     )
 
-    # ── 1c: flags ─────────────────────────────────────────────
     trt["direction_unknown"] = trt["sub_direction"].fillna("").eq("unknown").astype(int)
     ctl["direction_unknown"] = 0
 
@@ -247,7 +244,6 @@ def prepare_features(df: pd.DataFrame) -> tuple:
 
     df = df.copy()
 
-    # ── A: log1p player quality (EDA Finding 3) ──────────────
     # Treated: 23 nulls → fill with 0. Control: all null → fill with 0.
     gc = pd.to_numeric(df["goal_contributions_per90"], errors="coerce").fillna(0.0)
     df["log1p_player_quality"] = np.log1p(gc)
@@ -257,7 +253,6 @@ def prepare_features(df: pd.DataFrame) -> tuple:
         n_null_quality,
     )
 
-    # ── B: derived scalar features ────────────────────────────
     df["subs_used_before"] = (df["sub_slot"] - 1).clip(0, 5).astype(float)
 
     # player_out_minutes_l30: control rows all null → fill with 0
@@ -273,7 +268,6 @@ def prepare_features(df: pd.DataFrame) -> tuple:
         df["opponent_points_l4"].isna().sum(), opp_median,
     )
 
-    # ── C: categorical features ───────────────────────────────
     # sub_direction: control rows null → fill with 'neutral'
     df["sub_direction_filled"] = df["sub_direction"].fillna("neutral")
 
@@ -283,7 +277,6 @@ def prepare_features(df: pd.DataFrame) -> tuple:
     # game_state label
     df["game_state"] = _game_state_series(df)
 
-    # ── D: league dummies (reference = ENG-Premier League) ───
     lg_dummies = pd.get_dummies(df["league"], prefix="lg", dtype=float)
     lg_cols = sorted([c for c in lg_dummies.columns if "ENG" not in c])
     lg_dummies = lg_dummies[lg_cols]
@@ -291,7 +284,6 @@ def prepare_features(df: pd.DataFrame) -> tuple:
         c.replace("-", "_").replace(" ", "_") for c in lg_dummies.columns
     ]
 
-    # ── E: standardize continuous features ───────────────────
     cont_vals = df[CONTINUOUS_FEATURES].astype(float)
     scaler = StandardScaler()
     cont_scaled = pd.DataFrame(
@@ -304,7 +296,6 @@ def prepare_features(df: pd.DataFrame) -> tuple:
         pickle.dump(scaler, fh)
     log.info("Saved feature_scaler.pkl")
 
-    # ── F: assemble X (game-state features only) ─────────────
     # sub_direction, player_in_position, player_out_minutes_l30, and
     # log1p_player_quality are excluded from X because they are null for
     # all control rows. Including them in the propensity model creates
@@ -356,7 +347,6 @@ def estimate_propensity(
     df = df.copy()
     df["propensity_score"] = ps
 
-    # ── AUC ──────────────────────────────────────────────────
     auc = roc_auc_score(y, ps)
     if auc > 0.90:
         log.warning("AUC=%.4f > 0.90 — groups are very different; matching may be poor", auc)
@@ -365,7 +355,6 @@ def estimate_propensity(
     else:
         log.info("AUC=%.4f — within target range [0.55, 0.90]", auc)
 
-    # ── Coefficients ─────────────────────────────────────────
     coef_df = pd.DataFrame({
         "feature": feature_names,
         "coefficient": model.coef_[0],
@@ -376,7 +365,6 @@ def estimate_propensity(
     for _, row in coef_df.head(10).iterrows():
         log.info("  %-40s  %+.4f", row["feature"], row["coefficient"])
 
-    # ── Mandatory sanity checks ───────────────────────────────
     coef_map = dict(zip(feature_names, model.coef_[0]))
 
     sd_coef = coef_map.get("score_diff_at_sub")
@@ -405,13 +393,11 @@ def estimate_propensity(
         lg_range, "✓" if ok_lg else "⚠ SMALL — league effects may not contribute",
     )
 
-    # ── Plain English interpretation (top 5) ─────────────────
     log.info("Top 5 features — interpretation:")
     for i, (_, row) in enumerate(coef_df.head(5).iterrows(), 1):
         interp = _COEF_INTERP.get(row["feature"], "no interpretation recorded")
         log.info("  %d. %s (%+.3f): %s", i, row["feature"], row["coefficient"], interp)
 
-    # ── Save ─────────────────────────────────────────────────
     ps_out = df[
         ["match_id", "league", "season", "team", "minute", "treated", "propensity_score"]
     ].copy()
@@ -451,7 +437,6 @@ def assess_common_support(df: pd.DataFrame) -> pd.DataFrame:
         (df_trim["treated"] == 1).sum(), (df_trim["treated"] == 0).sum(),
     )
 
-    # ── Per-league overlap stats ──────────────────────────────
     log.info("Per-league overlap statistics:")
     for lg in LEAGUE_ORDER:
         ldf = df_trim[df_trim["league"] == lg]
@@ -469,7 +454,6 @@ def assess_common_support(df: pd.DataFrame) -> pd.DataFrame:
             lg_overlap_max - lg_overlap_min, pct_in,
         )
 
-    # ── Plot ─────────────────────────────────────────────────
     plt.style.use("seaborn-v0_8-whitegrid")
     fig, axes = plt.subplots(1, 5, figsize=(18, 4), sharey=False)
 
@@ -573,7 +557,6 @@ def _do_match(df: pd.DataFrame, caliper: float) -> pd.DataFrame:
                     t_pl30 = float(t_pl30) if pd.notna(t_pl30) else 0.0
 
                     all_pairs.append({
-                        # ── Treated ─────────────────────────────────────
                         "t_match_id":               t_row["match_id"],
                         "t_minute":                 int(t_row["minute"]),
                         "t_team":                   t_row["team"],
@@ -595,7 +578,6 @@ def _do_match(df: pd.DataFrame, caliper: float) -> pd.DataFrame:
                         "t_outcome_window_truncated": int(t_row["outcome_window_truncated"]),
                         "t_direction_unknown":      int(t_row.get("direction_unknown", 0)),
                         "t_extended_window_treated": int(t_row.get("extended_window_treated", 0)),
-                        # ── Control ─────────────────────────────────────
                         "c_match_id":               c_row["match_id"],
                         "c_minute":                 int(c_row["minute"]),
                         "c_team":                   c_row["team"],
@@ -609,7 +591,6 @@ def _do_match(df: pd.DataFrame, caliper: float) -> pd.DataFrame:
                         "c_goal_diff_next15":       int(c_row["goal_diff_next15"]),
                         "c_goal_diff_next30":       int(c_row["goal_diff_next30"]),
                         "c_outcome_window_truncated": int(c_row["outcome_window_truncated"]),
-                        # ── Pair-level ───────────────────────────────────
                         "league":         lg,
                         "season":         t_row["season"],
                         "ps_distance":    float(dist),
@@ -705,7 +686,6 @@ def assess_balance(
 
     records: list[dict] = []
 
-    # ── Game-state confounders (used for PASS/FAIL verdict) ───
     log.info("Game-state covariate balance (determines PASS/FAIL):")
     for cov in BALANCE_CORE:
         smd_b = _compute_smd(pre_trt[cov].astype(float),  pre_ctl[cov].astype(float))
@@ -736,7 +716,6 @@ def assess_balance(
             marker,
         )
 
-    # ── Structural covariates (reported only, excluded from verdict) ──
     # These are always null for control rows (filled with 0), so their
     # SMD is structurally high regardless of matching quality — not a
     # matching failure, but an inherent property of the control pool design.
@@ -764,7 +743,6 @@ def assess_balance(
     bal_df.to_csv(RESULTS_DIR / "balance_report.csv", index=False)
     log.info("Saved balance_report.csv")
 
-    # ── Overall assessment (game-state covariates only) ───────
     core_df = bal_df[bal_df["flag"] != "STRUCTURAL"]
     n_err  = (core_df["flag"] == "ERROR").sum()
     n_warn = (core_df["flag"] == "WARNING").sum()
@@ -989,7 +967,6 @@ def run_all() -> tuple:
     pairs, caliper = match_observations(df)
     bal_df, assessment = assess_balance(df, pairs, caliper)
 
-    # ── Re-run with tighter caliper if GAME-STATE balance fails ─
     # Structural covariates (player quality, fatigue) always imbalanced by
     # design and do not trigger re-matching.
     if assessment == "FAIL":
